@@ -116,10 +116,10 @@ class Camera {
 			this.updateTransformationAndViewMatrices();
 		};
 
-		canvas.addEventListener('mousedown', () => canvas.addEventListener('mousemove', canvas_mousemove_callback));
-		canvas.addEventListener('mouseup', () => canvas.removeEventListener('mousemove', canvas_mousemove_callback));
+		canvas.addEventListener('mousedown', () => window.addEventListener('mousemove', canvas_mousemove_callback));
+		canvas.addEventListener('mouseup', () => window.removeEventListener('mousemove', canvas_mousemove_callback));
 
-		canvas.addEventListener('wheel', (evt) => {
+		window.addEventListener('wheel', (evt) => {
 
 			this.translation.arr[2] += Math.sign(evt.deltaY) * 0.2;
 
@@ -129,6 +129,13 @@ class Camera {
 
 			this.updateTransformationAndViewMatrices();
 		});
+
+		window.addEventListener(
+
+			'resize',
+
+			() => this.updateProjectionMatrix(45, window.innerWidth / window.innerHeight, 0.1, 100, 1),
+		);
 	}
 
 	updateTransformationAndViewMatrices () {

@@ -49735,17 +49735,20 @@ var Camera = /*#__PURE__*/function () {
     };
 
     canvas.addEventListener('mousedown', function () {
-      return canvas.addEventListener('mousemove', canvas_mousemove_callback);
+      return window.addEventListener('mousemove', canvas_mousemove_callback);
     });
     canvas.addEventListener('mouseup', function () {
-      return canvas.removeEventListener('mousemove', canvas_mousemove_callback);
+      return window.removeEventListener('mousemove', canvas_mousemove_callback);
     });
-    canvas.addEventListener('wheel', function (evt) {
+    window.addEventListener('wheel', function (evt) {
       _this.translation.arr[2] += Math.sign(evt.deltaY) * 0.2;
 
       _this.transformation_matrix.makeTranslation(_this.translation, 1).preRotateQuat(_this.quaternion);
 
       _this.updateTransformationAndViewMatrices();
+    });
+    window.addEventListener('resize', function () {
+      return _this.updateProjectionMatrix(45, window.innerWidth / window.innerHeight, 0.1, 100, 1);
     });
   }
 
