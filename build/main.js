@@ -49652,7 +49652,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 /* harmony import */ var _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @3d-smile/glkit */ "./node_modules/@3d-smile/glkit/build/index.js");
 /* harmony import */ var _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__);
-var _MathDebug$Vec;
+var _MathDebug$Vec, _MathDebug$Vec2;
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -49687,6 +49687,7 @@ no-magic-numbers,
 max-statements,
 prefer-destructuring,
 no-bitwise,
+max-params,
 */
 
 
@@ -49773,14 +49774,10 @@ var Camera = /*#__PURE__*/function () {
   return Camera;
 }();
 
-var sphere2_center_coordinates = [Math.random(), Math.random(), Math.random()];
-var sphere2_radius = Math.random(); // const sphere2_center_coordinates = [ 0.6413700729213005, 0.1345448352243932, 0.948713476129244 ];
-// const sphere2_radius = 0.17544209783733833;
-
 var DETAIL = 8;
 
 var Sphere = /*#__PURE__*/function () {
-  function Sphere(center, radius, camera) {
+  function Sphere(center, radius, camera, detail) {
     _classCallCheck(this, Sphere);
 
     this.center = center;
@@ -49827,7 +49824,7 @@ var Sphere = /*#__PURE__*/function () {
       this.index_buffer = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer); // this.vertex_array = gl.createVertexArray();
 
-      var icosahedron_geometry = new three__WEBPACK_IMPORTED_MODULE_1__["IcosahedronGeometry"](this.radius, DETAIL);
+      var icosahedron_geometry = new three__WEBPACK_IMPORTED_MODULE_1__["IcosahedronGeometry"](this.radius, detail);
       icosahedron_geometry.translate(this.center.arr[0], this.center.arr[1], this.center.arr[2]);
       this.position_data = Array.prototype.slice.call(icosahedron_geometry.attributes.position.array);
       this.normal_data = Array.prototype.slice.call(icosahedron_geometry.attributes.normal.array);
@@ -50286,19 +50283,37 @@ var Sphere = /*#__PURE__*/function () {
 var camera = new Camera(45, window.innerWidth / window.innerHeight, 0.1, 100, 1);
 camera.translation.arr[2] += 10;
 camera.updateTransformationAndViewMatrices();
-var sphere1 = new Sphere(new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3().set(0, 0, 0), 1, camera);
-var sphere2 = new Sphere((_MathDebug$Vec = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3()).set.apply(_MathDebug$Vec, sphere2_center_coordinates), sphere2_radius, camera);
+var sphere1_center_coordinates = [0, 0, 0];
+var sphere1_radius = 1;
+var sphere2_center_coordinates = [0.5, 0.5, 0.5];
+var sphere2_radius = 0.5;
+var sphere1 = new Sphere((_MathDebug$Vec = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3()).set.apply(_MathDebug$Vec, sphere1_center_coordinates), sphere1_radius, camera, DETAIL);
+var sphere2 = new Sphere((_MathDebug$Vec2 = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3()).set.apply(_MathDebug$Vec2, sphere2_center_coordinates), sphere2_radius, camera, DETAIL);
 sphere1.subtract(sphere2);
+var spheres = [sphere1, sphere2];
 
 var render = function render() {
   gl.clearColor(0.5, 0.5, 0.5, 1);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  sphere1.draw();
-  sphere2.draw();
+  spheres.forEach(function (sphere) {
+    return sphere.draw();
+  });
   requestAnimationFrame(render);
 };
 
 render();
+
+window._update = function (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) {
+  spheres.length = 0;
+
+  var _sphere1 = new Sphere(new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3().set(s1x, s1y, s1z), s1r, camera, detail);
+
+  var _sphere2 = new Sphere(new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3().set(s2x, s2y, s2z), s2r, camera, detail);
+
+  _sphere1.subtract(_sphere2);
+
+  spheres.push(_sphere1, _sphere2);
+};
 
 /***/ }),
 

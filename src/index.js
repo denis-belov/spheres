@@ -5,6 +5,7 @@ no-magic-numbers,
 max-statements,
 prefer-destructuring,
 no-bitwise,
+max-params,
 */
 
 
@@ -164,18 +165,11 @@ class Camera {
 
 
 
-const sphere2_center_coordinates = [ Math.random(), Math.random(), Math.random() ];
-const sphere2_radius = Math.random();
-// const sphere2_center_coordinates = [ 0.6413700729213005, 0.1345448352243932, 0.948713476129244 ];
-// const sphere2_radius = 0.17544209783733833;
-
-
-
 const DETAIL = 8;
 
 class Sphere {
 
-	constructor (center, radius, camera) {
+	constructor (center, radius, camera, detail) {
 
 		this.center = center;
 
@@ -315,7 +309,7 @@ class Sphere {
 
 			// this.vertex_array = gl.createVertexArray();
 
-			const icosahedron_geometry = new THREE.IcosahedronGeometry(this.radius, DETAIL);
+			const icosahedron_geometry = new THREE.IcosahedronGeometry(this.radius, detail);
 			icosahedron_geometry.translate(this.center.arr[0], this.center.arr[1], this.center.arr[2]);
 
 			this.position_data = Array.prototype.slice.call(icosahedron_geometry.attributes.position.array);
@@ -1022,10 +1016,24 @@ camera.updateTransformationAndViewMatrices();
 
 
 
-const sphere1 = new Sphere(new MathDebug.Vec3().set(0, 0, 0), 1, camera);
-const sphere2 = new Sphere(new MathDebug.Vec3().set(...sphere2_center_coordinates), sphere2_radius, camera);
+const sphere1_center_coordinates = [ 0, 0, 0 ];
+const sphere1_radius = 1;
+
+const sphere2_center_coordinates = [ 0.5, 0.5, 0.5 ];
+const sphere2_radius = 0.5;
+
+const sphere1 = new Sphere(new MathDebug.Vec3().set(...sphere1_center_coordinates), sphere1_radius, camera, DETAIL);
+const sphere2 = new Sphere(new MathDebug.Vec3().set(...sphere2_center_coordinates), sphere2_radius, camera, DETAIL);
 
 sphere1.subtract(sphere2);
+
+
+
+const spheres = [
+
+	sphere1,
+	sphere2,
+];
 
 
 
@@ -1034,10 +1042,21 @@ const render = () => {
 	gl.clearColor(0.5, 0.5, 0.5, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	sphere1.draw();
-	sphere2.draw();
+	spheres.forEach((sphere) => sphere.draw());
 
 	requestAnimationFrame(render);
 };
 
 render();
+
+window._update = (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) => {
+
+	spheres.length = 0;
+
+	const _sphere1 = new Sphere(new MathDebug.Vec3().set(s1x, s1y, s1z), s1r, camera, detail);
+	const _sphere2 = new Sphere(new MathDebug.Vec3().set(s2x, s2y, s2z), s2r, camera, detail);
+
+	_sphere1.subtract(_sphere2);
+
+	spheres.push(_sphere1, _sphere2);
+};
