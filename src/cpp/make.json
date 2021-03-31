@@ -1,0 +1,34 @@
+{
+	"type": "bin",
+
+	"target": "main",
+
+	"includes": "$(SRC)",
+
+	"objects": {
+
+		"internal": {
+
+			"cpp": [
+
+				{
+					"source": "$(SRC)/main.cpp",
+
+					"options": {
+
+						"headers": []
+					}
+				},
+
+				{
+					"source": "$(SRC)/func.cpp",
+
+					"options": {
+
+						"headers": []
+					}
+				}
+			]
+		}
+	}
+}

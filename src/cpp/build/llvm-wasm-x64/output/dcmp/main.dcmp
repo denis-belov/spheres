@@ -1,0 +1,21 @@
+export memory memory(initial: 2, max: 0);
+
+global g_a:int = 66560;
+export global dso_handle:int = 1024;
+export global data_end:int = 1024;
+export global global_base:int = 1024;
+export global heap_base:int = 66560;
+export global memory_base:int = 0;
+export global table_base:int = 1;
+
+export function wasm_call_ctors() {
+}
+
+function function_cpp(a:double):int {
+  return 0
+}
+
+function extern_function():int {
+  return 178
+}
+
