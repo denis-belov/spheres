@@ -50329,6 +50329,7 @@ var render = function render() {
 render(); // console commands
 
 window._update = function (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) {
+  console.warn('wait');
   spheres.length = 0;
 
   var _sphere1 = new Sphere(new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3().set(s1x, s1y, s1z), s1r, camera, detail);
@@ -50338,12 +50339,12 @@ window._update = function (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) {
   _sphere1.subtract(_sphere2);
 
   spheres.push(_sphere1, _sphere2);
-  console.log('mesh updated');
+  console.warn('mesh updated');
 };
 
 window._setTreeDepth = function (depth) {
   Sphere.tree_depth = depth;
-  console.log('tree depth updated');
+  console.warn('tree depth updated');
 };
 
 /***/ }),
