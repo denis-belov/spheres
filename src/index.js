@@ -666,10 +666,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 
 				{
@@ -684,10 +681,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 
 				{
@@ -702,10 +696,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 
 
@@ -726,10 +717,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 
 				{
@@ -744,10 +732,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 
 				{
@@ -762,10 +747,7 @@ class Sphere {
 							.negate()
 							.intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-					intersection1 && intersection2 && intersections.push({
-
-						point: intersection1,
-					});
+					intersection1 && intersection2 && intersections.push(intersection1);
 				}
 			});
 

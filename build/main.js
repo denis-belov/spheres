@@ -50030,27 +50030,21 @@ var Sphere = /*#__PURE__*/function () {
           {
             var intersection1 = a.clone().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
             var intersection2 = a.clone().negate().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
-            intersection1 && intersection2 && intersections.push({
-              point: intersection1
-            });
+            intersection1 && intersection2 && intersections.push(intersection1);
           }
           {
             var _intersection11 = b.clone().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
             var _intersection12 = b.clone().negate().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-            _intersection11 && _intersection12 && intersections.push({
-              point: _intersection11
-            });
+            _intersection11 && _intersection12 && intersections.push(_intersection11);
           }
           {
             var _intersection13 = c.clone().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
             var _intersection14 = c.clone().negate().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
 
-            _intersection13 && _intersection14 && intersections.push({
-              point: _intersection13
-            });
+            _intersection13 && _intersection14 && intersections.push(_intersection13);
           }
 
           var _a = t1.v[0].clone().to(t1.v[1]);
@@ -50064,27 +50058,21 @@ var Sphere = /*#__PURE__*/function () {
 
             var _intersection16 = _a.clone().negate().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-            _intersection15 && _intersection16 && intersections.push({
-              point: _intersection15
-            });
+            _intersection15 && _intersection16 && intersections.push(_intersection15);
           }
           {
             var _intersection17 = _b.clone().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
             var _intersection18 = _b.clone().negate().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-            _intersection17 && _intersection18 && intersections.push({
-              point: _intersection17
-            });
+            _intersection17 && _intersection18 && intersections.push(_intersection17);
           }
           {
             var _intersection19 = _c.clone().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
             var _intersection20 = _c.clone().negate().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-            _intersection19 && _intersection20 && intersections.push({
-              point: _intersection19
-            });
+            _intersection19 && _intersection20 && intersections.push(_intersection19);
           }
         });
 
