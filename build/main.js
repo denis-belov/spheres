@@ -50339,6 +50339,8 @@ window._setTreeDepth = function (depth) {
   console.warn('tree depth updated');
 };
 
+console.log('v1');
+
 /***/ }),
 
 /***/ "./src/index.scss":
