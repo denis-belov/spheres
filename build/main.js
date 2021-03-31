@@ -49674,6 +49674,8 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -49777,8 +49779,6 @@ var Camera = /*#__PURE__*/function () {
   return Camera;
 }();
 
-var DETAIL = 8;
-
 var Sphere = /*#__PURE__*/function () {
   function Sphere(center, radius, camera, detail) {
     _classCallCheck(this, Sphere);
@@ -49801,7 +49801,7 @@ var Sphere = /*#__PURE__*/function () {
       }
 
       gl.attachShader(this.program, this.vertex_shader);
-      this.fragment_shader_code = "#version 300 es\n\n\t\t\t\tprecision highp int;\n\t\t\t\tprecision highp float;\n\n\t\t\t\tuniform vec3 light_position;\n\n\t\t\t\tin vec4 v_world_position;\n\t\t\t\tin vec4 v_camera_position;\n\t\t\t\tin vec3 v_color;\n\t\t\t\tin vec3 v_normal;\n\n\t\t\t\tout vec4 frag_color;\n\n\t\t\t\tvoid main (void) {\n\n\t\t\t\t\tfloat diffuse =\n\t\t\t\t\t\tdot(\n\n\t\t\t\t\t\t\tnormalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),\n\t\t\t\t\t\t\t// vec3(0.0, 0.0, 1.0)\n\t\t\t\t\t\t\tnormalize(v_camera_position.xyz - v_world_position.xyz)\n\t\t\t\t\t\t);\n\n\t\t\t\t\tfrag_color = vec4((vec3(0.3) + vec3(diffuse)) * vec3(0.7), 1.0);\n\t\t\t\t}\n\t\t\t\t";
+      this.fragment_shader_code = "#version 300 es\n\n\t\t\t\tprecision highp int;\n\t\t\t\tprecision highp float;\n\n\t\t\t\tuniform vec3 light_position;\n\n\t\t\t\tin vec4 v_world_position;\n\t\t\t\tin vec4 v_camera_position;\n\t\t\t\tin vec3 v_color;\n\t\t\t\tin vec3 v_normal;\n\n\t\t\t\tout vec4 frag_color;\n\n\t\t\t\tvoid main (void) {\n\n\t\t\t\t\tfloat diffuse =\n\t\t\t\t\t\tdot(\n\n\t\t\t\t\t\t\tnormalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),\n\n\t\t\t\t\t\t\tnormalize(v_camera_position.xyz - v_world_position.xyz)\n\t\t\t\t\t\t);\n\n\t\t\t\t\tfrag_color = vec4((vec3(0.3) + vec3(diffuse)) * vec3(0.7), 1.0);\n\t\t\t\t}\n\t\t\t\t";
       this.fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
       gl.shaderSource(this.fragment_shader, this.fragment_shader_code);
       gl.compileShader(this.fragment_shader);
@@ -49846,14 +49846,14 @@ var Sphere = /*#__PURE__*/function () {
       this.positions.push(v1, v2, v3);
     }
 
-    this.tree = this.makeTree(this.positions, 0, 0);
+    this.tree = this.makeSphereSegmentTree(this.positions, 0, 0);
     this.edge_triangles = [];
     this.nearest_triangles = [];
   }
 
   _createClass(Sphere, [{
-    key: "makeTree",
-    value: function makeTree(positions, counter, _rotation) {
+    key: "makeSphereSegmentTree",
+    value: function makeSphereSegmentTree(positions, counter, _rotation) {
       var tree = [];
       var positions1 = [];
       var positions2 = []; // x' = x cos θ − y sin θ
@@ -49881,19 +49881,44 @@ var Sphere = /*#__PURE__*/function () {
         }
       }
 
-      if (counter === 11) {
-        tree.push(positions1, positions2);
+      if (counter === Sphere.tree_depth - 1) {
+        // tree.push(positions1, positions2);
+        tree.push(this.makeYPositionTree(positions1), this.makeYPositionTree(positions2));
       } else {
         var rotation1 = _rotation;
         var rotation2 = _rotation;
         var next_counter = counter + 1;
         rotation1 += Math.PI / (2 * next_counter);
         rotation2 -= Math.PI / (2 * next_counter);
-        var tree1 = this.makeTree(positions1, next_counter, rotation1);
-        var tree2 = this.makeTree(positions2, next_counter, rotation2);
+        var tree1 = this.makeSphereSegmentTree(positions1, next_counter, rotation1);
+        var tree2 = this.makeSphereSegmentTree(positions2, next_counter, rotation2);
         tree.push(tree1, tree2);
       }
 
+      return tree;
+    }
+  }, {
+    key: "makeYPositionTree",
+    value: function makeYPositionTree(positions) {
+      var tree = [];
+      var positions1 = [];
+      var positions2 = [];
+
+      for (var i = 0; i < positions.length; i += 3) {
+        var v1 = positions[i + 0];
+        var v2 = positions[i + 1];
+        var v3 = positions[i + 2];
+
+        if (v1.arr[1] >= this.center.arr[1] || v2.arr[1] >= this.center.arr[1] || v3.arr[1] >= this.center.arr[1]) {
+          positions1.push(v1, v2, v3);
+        }
+
+        if (v1.arr[1] <= this.center.arr[1] || v2.arr[1] <= this.center.arr[1] || v3.arr[1] <= this.center.arr[1]) {
+          positions2.push(v1, v2, v3);
+        }
+      }
+
+      tree.push(positions1, positions2);
       return tree;
     }
   }, {
@@ -49902,7 +49927,7 @@ var Sphere = /*#__PURE__*/function () {
       var positions = this.tree;
       var rotation = 0;
 
-      for (var i = 0; i < 12; ++i) {
+      for (var i = 0; i < Sphere.tree_depth; ++i) {
         var _cos = Math.cos(rotation);
 
         var _sin = Math.sin(rotation);
@@ -49916,6 +49941,12 @@ var Sphere = /*#__PURE__*/function () {
           positions = positions[1];
           rotation -= Math.PI / (2 * (i + 1));
         }
+      }
+
+      if (point.arr[1] >= this.center.arr[1]) {
+        positions = positions[0];
+      } else {
+        positions = positions[1];
       }
 
       var result = false;
@@ -50283,6 +50314,8 @@ var Sphere = /*#__PURE__*/function () {
   return Sphere;
 }();
 
+_defineProperty(Sphere, "tree_depth", 4);
+
 var camera = new Camera(45, window.innerWidth / window.innerHeight, 0.1, 100, 1);
 camera.translation.arr[2] += 10;
 camera.updateTransformationAndViewMatrices();
@@ -50290,6 +50323,7 @@ var sphere1_center_coordinates = [0, 0, 0];
 var sphere1_radius = 1;
 var sphere2_center_coordinates = [0.5, 0.5, 0.5];
 var sphere2_radius = 0.5;
+var DETAIL = 8;
 var sphere1 = new Sphere((_MathDebug$Vec = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3()).set.apply(_MathDebug$Vec, sphere1_center_coordinates), sphere1_radius, camera, DETAIL);
 var sphere2 = new Sphere((_MathDebug$Vec2 = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3()).set.apply(_MathDebug$Vec2, sphere2_center_coordinates), sphere2_radius, camera, DETAIL);
 sphere1.subtract(sphere2);
@@ -50304,7 +50338,7 @@ var render = function render() {
   requestAnimationFrame(render);
 };
 
-render();
+render(); // console commands
 
 window._update = function (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) {
   spheres.length = 0;
@@ -50316,6 +50350,12 @@ window._update = function (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) {
   _sphere1.subtract(_sphere2);
 
   spheres.push(_sphere1, _sphere2);
+  console.log('mesh updated');
+};
+
+window._setTreeDepth = function (depth) {
+  Sphere.tree_depth = depth;
+  console.log('tree depth updated');
 };
 
 /***/ }),

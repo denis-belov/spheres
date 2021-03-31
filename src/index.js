@@ -172,9 +172,11 @@ class Camera {
 
 
 
-const DETAIL = 8;
-
 class Sphere {
+
+	static tree_depth = 4;
+
+
 
 	constructor (center, radius, camera, detail) {
 
@@ -259,7 +261,7 @@ class Sphere {
 						dot(
 
 							normalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),
-							// vec3(0.0, 0.0, 1.0)
+
 							normalize(v_camera_position.xyz - v_world_position.xyz)
 						);
 
@@ -349,13 +351,13 @@ class Sphere {
 			this.positions.push(v1, v2, v3);
 		}
 
-		this.tree = this.makeTree(this.positions, 0, 0);
+		this.tree = this.makeSphereSegmentTree(this.positions, 0, 0);
 
 		this.edge_triangles = [];
 		this.nearest_triangles = [];
 	}
 
-	makeTree (positions, counter, _rotation) {
+	makeSphereSegmentTree (positions, counter, _rotation) {
 
 		const tree = [];
 
@@ -403,9 +405,16 @@ class Sphere {
 			}
 		}
 
-		if (counter === 11) {
+		if (counter === Sphere.tree_depth - 1) {
 
-			tree.push(positions1, positions2);
+			// tree.push(positions1, positions2);
+
+			tree.push(
+
+				this.makeYPositionTree(positions1),
+
+				this.makeYPositionTree(positions2),
+			);
 		}
 		else {
 
@@ -417,11 +426,52 @@ class Sphere {
 			rotation1 += Math.PI / (2 * next_counter);
 			rotation2 -= Math.PI / (2 * next_counter);
 
-			const tree1 = this.makeTree(positions1, next_counter, rotation1);
-			const tree2 = this.makeTree(positions2, next_counter, rotation2);
+			const tree1 = this.makeSphereSegmentTree(positions1, next_counter, rotation1);
+			const tree2 = this.makeSphereSegmentTree(positions2, next_counter, rotation2);
 
 			tree.push(tree1, tree2);
 		}
+
+		return tree;
+	}
+
+	makeYPositionTree (positions) {
+
+		const tree = [];
+
+		const positions1 = [];
+		const positions2 = [];
+
+
+
+		for (let i = 0; i < positions.length; i += 3) {
+
+			const v1 = positions[i + 0];
+			const v2 = positions[i + 1];
+			const v3 = positions[i + 2];
+
+			if (
+
+				v1.arr[1] >= this.center.arr[1] ||
+				v2.arr[1] >= this.center.arr[1] ||
+				v3.arr[1] >= this.center.arr[1]
+			) {
+
+				positions1.push(v1, v2, v3);
+			}
+
+			if (
+
+				v1.arr[1] <= this.center.arr[1] ||
+				v2.arr[1] <= this.center.arr[1] ||
+				v3.arr[1] <= this.center.arr[1]
+			) {
+
+				positions2.push(v1, v2, v3);
+			}
+		}
+
+		tree.push(positions1, positions2);
 
 		return tree;
 	}
@@ -432,7 +482,7 @@ class Sphere {
 
 		let rotation = 0;
 
-		for (let i = 0; i < 12; ++i) {
+		for (let i = 0; i < Sphere.tree_depth; ++i) {
 
 			const _cos = Math.cos(rotation);
 			const _sin = Math.sin(rotation);
@@ -451,6 +501,16 @@ class Sphere {
 
 				rotation -= Math.PI / (2 * (i + 1));
 			}
+		}
+
+
+		if (point.arr[1] >= this.center.arr[1]) {
+
+			positions = positions[0];
+		}
+		else {
+
+			positions = positions[1];
 		}
 
 
@@ -1029,6 +1089,8 @@ const sphere1_radius = 1;
 const sphere2_center_coordinates = [ 0.5, 0.5, 0.5 ];
 const sphere2_radius = 0.5;
 
+const DETAIL = 8;
+
 const sphere1 = new Sphere(new MathDebug.Vec3().set(...sphere1_center_coordinates), sphere1_radius, camera, DETAIL);
 const sphere2 = new Sphere(new MathDebug.Vec3().set(...sphere2_center_coordinates), sphere2_radius, camera, DETAIL);
 
@@ -1056,6 +1118,10 @@ const render = () => {
 
 render();
 
+
+
+// console commands
+
 window._update = (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) => {
 
 	spheres.length = 0;
@@ -1066,4 +1132,13 @@ window._update = (s1x, s1y, s1z, s1r, s2x, s2y, s2z, s2r, detail) => {
 	_sphere1.subtract(_sphere2);
 
 	spheres.push(_sphere1, _sphere2);
+
+	console.log('mesh updated');
+};
+
+window._setTreeDepth = (depth) => {
+
+	Sphere.tree_depth = depth;
+
+	console.log('tree depth updated');
 };
