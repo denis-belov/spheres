@@ -49836,7 +49836,6 @@ var Sphere = /*#__PURE__*/function () {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.normal_buffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normal_data), gl.STATIC_DRAW);
     }
-    this._v = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
     this.positions = [];
 
     for (var i = 0; i < this.position_data.length; i += 9) {
@@ -49849,6 +49848,12 @@ var Sphere = /*#__PURE__*/function () {
     this.tree = this.makeSphereSegmentTree(this.positions, 0, 0);
     this.edge_triangles = [];
     this.nearest_triangles = [];
+    this._v1 = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
+    this._v2 = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
+    this._v3 = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
+    this._a = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
+    this._b = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
+    this._c = new _3d_smile_glkit__WEBPACK_IMPORTED_MODULE_2__["MathDebug"].Vec3();
   }
 
   _createClass(Sphere, [{
@@ -49955,7 +49960,7 @@ var Sphere = /*#__PURE__*/function () {
         var v1 = positions[_i + 0];
         var v2 = positions[_i + 1];
         var v3 = positions[_i + 2];
-        result = this._v.copy(point).from(this.center).intersectTriangle(point, v1, v2, v3);
+        result = this._v1.copy(point).from(this.center).intersectTriangle(point, v1, v2, v3);
 
         if (result) {
           break;
@@ -49972,107 +49977,93 @@ var Sphere = /*#__PURE__*/function () {
       this.edge_triangles.forEach(function (t1) {
         var intersections = [];
         sphere.edge_triangles.forEach(function (t0) {
-          var a = t0.v[0].clone().to(t0.v[1]);
-          var b = t0.v[1].clone().to(t0.v[2]);
-          var c = t0.v[2].clone().to(t0.v[0]);
+          _this2._a.copy(t0.v[0]).to(t0.v[1]);
+
+          _this2._b.copy(t0.v[1]).to(t0.v[2]);
+
+          _this2._c.copy(t0.v[2]).to(t0.v[0]);
+
           {
-            var intersection1 = a.clone().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-            var intersection2 = a.clone().negate().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
-            intersection1 && intersection2 && intersections.push(intersection1);
+            var _int = _this2._a.clone().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
+
+            _int && _this2._a.dot(_this2._v1.copy(t0.v[1]).to(_int)) <= 0 && intersections.push(_int);
           }
           {
-            var _intersection = b.clone().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
+            var _int2 = _this2._b.clone().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
-            var _intersection2 = b.clone().negate().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
-
-            _intersection && _intersection2 && intersections.push(_intersection);
+            _int2 && _this2._b.dot(_this2._v1.copy(t0.v[2]).to(_int2)) <= 0 && intersections.push(_int2);
           }
           {
-            var _intersection3 = c.clone().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
+            var _int3 = _this2._c.clone().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-            var _intersection4 = c.clone().negate().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-
-            _intersection3 && _intersection4 && intersections.push(_intersection3);
+            _int3 && _this2._c.dot(_this2._v1.copy(t0.v[0]).to(_int3)) <= 0 && intersections.push(_int3);
           }
 
-          var _a = t1.v[0].clone().to(t1.v[1]);
+          _this2._a.copy(t1.v[0]).to(t1.v[1]);
 
-          var _b = t1.v[1].clone().to(t1.v[2]);
+          _this2._b.copy(t1.v[1]).to(t1.v[2]);
 
-          var _c = t1.v[2].clone().to(t1.v[0]);
+          _this2._c.copy(t1.v[2]).to(t1.v[0]);
 
           {
-            var _intersection5 = _a.clone().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
+            var _int4 = _this2._a.clone().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection6 = _a.clone().negate().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection5 && _intersection6 && intersections.push(_intersection5);
+            _int4 && _this2._a.dot(_this2._v1.copy(t1.v[1]).to(_int4)) <= 0 && intersections.push(_int4);
           }
           {
-            var _intersection7 = _b.clone().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
+            var _int5 = _this2._b.clone().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection8 = _b.clone().negate().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection7 && _intersection8 && intersections.push(_intersection7);
+            _int5 && _this2._b.dot(_this2._v1.copy(t1.v[2]).to(_int5)) <= 0 && intersections.push(_int5);
           }
           {
-            var _intersection9 = _c.clone().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
+            var _int6 = _this2._c.clone().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection10 = _c.clone().negate().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection9 && _intersection10 && intersections.push(_intersection9);
+            _int6 && _this2._c.dot(_this2._v1.copy(t1.v[0]).to(_int6)) <= 0 && intersections.push(_int6);
           }
         });
         sphere.nearest_triangles.forEach(function (t0) {
-          var a = t0.v[0].clone().to(t0.v[1]);
-          var b = t0.v[1].clone().to(t0.v[2]);
-          var c = t0.v[2].clone().to(t0.v[0]);
+          _this2._a.copy(t0.v[0]).to(t0.v[1]);
+
+          _this2._b.copy(t0.v[1]).to(t0.v[2]);
+
+          _this2._c.copy(t0.v[2]).to(t0.v[0]);
+
           {
-            var intersection1 = a.clone().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-            var intersection2 = a.clone().negate().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
-            intersection1 && intersection2 && intersections.push(intersection1);
+            var _int7 = _this2._a.clone().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
+
+            _int7 && _this2._a.dot(_this2._v1.copy(t0.v[1]).to(_int7)) <= 0 && intersections.push(_int7);
           }
           {
-            var _intersection11 = b.clone().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
+            var _int8 = _this2._b.clone().intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
-            var _intersection12 = b.clone().negate().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
-
-            _intersection11 && _intersection12 && intersections.push(_intersection11);
+            _int8 && _this2._b.dot(_this2._v1.copy(t0.v[2]).to(_int8)) <= 0 && intersections.push(_int8);
           }
           {
-            var _intersection13 = c.clone().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
+            var _int9 = _this2._c.clone().intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-            var _intersection14 = c.clone().negate().intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-
-            _intersection13 && _intersection14 && intersections.push(_intersection13);
+            _int9 && _this2._c.dot(_this2._v1.copy(t0.v[0]).to(_int9)) <= 0 && intersections.push(_int9);
           }
 
-          var _a = t1.v[0].clone().to(t1.v[1]);
+          _this2._a.copy(t1.v[0]).to(t1.v[1]);
 
-          var _b = t1.v[1].clone().to(t1.v[2]);
+          _this2._b.copy(t1.v[1]).to(t1.v[2]);
 
-          var _c = t1.v[2].clone().to(t1.v[0]);
+          _this2._c.copy(t1.v[2]).to(t1.v[0]);
 
           {
-            var _intersection15 = _a.clone().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
+            var _int10 = _this2._a.clone().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection16 = _a.clone().negate().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection15 && _intersection16 && intersections.push(_intersection15);
+            _int10 && _this2._a.dot(_this2._v1.copy(t1.v[1]).to(_int10)) <= 0 && intersections.push(_int10);
           }
           {
-            var _intersection17 = _b.clone().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
+            var _int11 = _this2._b.clone().intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection18 = _b.clone().negate().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection17 && _intersection18 && intersections.push(_intersection17);
+            _int11 && _this2._b.dot(_this2._v1.copy(t1.v[2]).to(_int11)) <= 0 && intersections.push(_int11);
           }
           {
-            var _intersection19 = _c.clone().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
+            var _int12 = _this2._c.clone().intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-            var _intersection20 = _c.clone().negate().intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
-
-            _intersection19 && _intersection20 && intersections.push(_intersection19);
+            _int12 && _this2._c.dot(_this2._v1.copy(t1.v[0]).to(_int12)) <= 0 && intersections.push(_int12);
           }
         });
 
@@ -50124,9 +50115,10 @@ var Sphere = /*#__PURE__*/function () {
             return a.distance(out1) - b.distance(out1);
           });
           var normal_h = (Math.pow(out1.distance(_in), 2) - Math.pow(_in.distance(out2), 2) - Math.pow(out1.distance(out2), 2)) / (2 * out1.distance(out2));
-          var normal_proj = out2.clone().add(out1.clone().to(out2).normalize().mulS(normal_h));
 
-          var normal = _in.clone().to(normal_proj).normalize();
+          var normal_proj = _this2._v1.copy(out2).add(_this2._v2.copy(out1).to(out2).normalize().mulS(normal_h));
+
+          var normal = _this2._v3.copy(_in).to(normal_proj).normalize();
 
           var intersections_extended = intersections_sorted.map(function (intersection) {
             return _in.clone().to(intersection).normalize().intersectPlane(_in, normal, normal_proj);

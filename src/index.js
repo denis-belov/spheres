@@ -331,7 +331,6 @@ class Sphere {
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normal_data), gl.STATIC_DRAW);
 		}
 
-		this._v = new MathDebug.Vec3();
 		this.positions = [];
 
 		for (let i = 0; i < this.position_data.length; i += 9) {
@@ -355,6 +354,13 @@ class Sphere {
 
 		this.edge_triangles = [];
 		this.nearest_triangles = [];
+
+		this._v1 = new MathDebug.Vec3();
+		this._v2 = new MathDebug.Vec3();
+		this._v3 = new MathDebug.Vec3();
+		this._a = new MathDebug.Vec3();
+		this._b = new MathDebug.Vec3();
+		this._c = new MathDebug.Vec3();
 	}
 
 	makeSphereSegmentTree (positions, counter, _rotation) {
@@ -523,7 +529,7 @@ class Sphere {
 			const v2 = positions[i + 1];
 			const v3 = positions[i + 2];
 
-			result = this._v
+			result = this._v1
 				.copy(point)
 				.from(this.center)
 				.intersectTriangle(point, v1, v2, v3);
@@ -545,104 +551,68 @@ class Sphere {
 
 			sphere.edge_triangles.forEach((t0) => {
 
-				const a = t0.v[0].clone().to(t0.v[1]);
-				const b = t0.v[1].clone().to(t0.v[2]);
-				const c = t0.v[2].clone().to(t0.v[0]);
+				this._a.copy(t0.v[0]).to(t0.v[1]);
+				this._b.copy(t0.v[1]).to(t0.v[2]);
+				this._c.copy(t0.v[2]).to(t0.v[0]);
 
 				{
-					const intersection1 =
-						a
+					const int =
+						this._a
 							.clone()
 							.intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						a
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._a.dot(this._v1.copy(t0.v[1]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						b
+					const int =
+						this._b
 							.clone()
 							.intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						b
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._b.dot(this._v1.copy(t0.v[2]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						c
+					const int =
+						this._c
 							.clone()
 							.intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						c
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._c.dot(this._v1.copy(t0.v[0]).to(int)) <= 0 && intersections.push(int);
 				}
 
 
 
-				const _a = t1.v[0].clone().to(t1.v[1]);
-				const _b = t1.v[1].clone().to(t1.v[2]);
-				const _c = t1.v[2].clone().to(t1.v[0]);
+				this._a.copy(t1.v[0]).to(t1.v[1]);
+				this._b.copy(t1.v[1]).to(t1.v[2]);
+				this._c.copy(t1.v[2]).to(t1.v[0]);
 
 				{
-					const intersection1 =
-						_a
+					const int =
+						this._a
 							.clone()
 							.intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_a
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._a.dot(this._v1.copy(t1.v[1]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						_b
+					const int =
+						this._b
 							.clone()
 							.intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_b
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._b.dot(this._v1.copy(t1.v[2]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						_c
+					const int =
+						this._c
 							.clone()
 							.intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_c
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._c.dot(this._v1.copy(t1.v[0]).to(int)) <= 0 && intersections.push(int);
 				}
 			});
 
@@ -650,104 +620,68 @@ class Sphere {
 
 			sphere.nearest_triangles.forEach((t0) => {
 
-				const a = t0.v[0].clone().to(t0.v[1]);
-				const b = t0.v[1].clone().to(t0.v[2]);
-				const c = t0.v[2].clone().to(t0.v[0]);
+				this._a.copy(t0.v[0]).to(t0.v[1]);
+				this._b.copy(t0.v[1]).to(t0.v[2]);
+				this._c.copy(t0.v[2]).to(t0.v[0]);
 
 				{
-					const intersection1 =
-						a
+					const int =
+						this._a
 							.clone()
 							.intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						a
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._a.dot(this._v1.copy(t0.v[1]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						b
+					const int =
+						this._b
 							.clone()
 							.intersectTriangle(t0.v[1], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						b
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._b.dot(this._v1.copy(t0.v[2]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						c
+					const int =
+						this._c
 							.clone()
 							.intersectTriangle(t0.v[2], t1.v[0], t1.v[1], t1.v[2]);
 
-					const intersection2 =
-						c
-							.clone()
-							.negate()
-							.intersectTriangle(t0.v[0], t1.v[0], t1.v[1], t1.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._c.dot(this._v1.copy(t0.v[0]).to(int)) <= 0 && intersections.push(int);
 				}
 
 
 
-				const _a = t1.v[0].clone().to(t1.v[1]);
-				const _b = t1.v[1].clone().to(t1.v[2]);
-				const _c = t1.v[2].clone().to(t1.v[0]);
+				this._a.copy(t1.v[0]).to(t1.v[1]);
+				this._b.copy(t1.v[1]).to(t1.v[2]);
+				this._c.copy(t1.v[2]).to(t1.v[0]);
 
 				{
-					const intersection1 =
-						_a
+					const int =
+						this._a
 							.clone()
 							.intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_a
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._a.dot(this._v1.copy(t1.v[1]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						_b
+					const int =
+						this._b
 							.clone()
 							.intersectTriangle(t1.v[1], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_b
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._b.dot(this._v1.copy(t1.v[2]).to(int)) <= 0 && intersections.push(int);
 				}
 
 				{
-					const intersection1 =
-						_c
+					const int =
+						this._c
 							.clone()
 							.intersectTriangle(t1.v[2], t0.v[0], t0.v[1], t0.v[2]);
 
-					const intersection2 =
-						_c
-							.clone()
-							.negate()
-							.intersectTriangle(t1.v[0], t0.v[0], t0.v[1], t0.v[2]);
-
-					intersection1 && intersection2 && intersections.push(intersection1);
+					int && this._c.dot(this._v1.copy(t1.v[0]).to(int)) <= 0 && intersections.push(int);
 				}
 			});
 
@@ -784,20 +718,20 @@ class Sphere {
 					(2 * out1.distance(out2));
 
 				const normal_proj =
-					out2
-						.clone()
+					this._v1
+						.copy(out2)
 						.add(
 
-							out1
-								.clone()
+							this._v2
+								.copy(out1)
 								.to(out2)
 								.normalize()
 								.mulS(normal_h),
 						);
 
 				const normal =
-					_in
-						.clone()
+					this._v3
+						.copy(_in)
 						.to(normal_proj)
 						.normalize();
 
