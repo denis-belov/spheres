@@ -262,7 +262,7 @@ class Sphere {
 
 							normalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),
 
-							normalize(v_camera_position.xyz - v_world_position.xyz)
+							normalize(v_camera_position.xyz + vec3(1.0) - v_world_position.xyz)
 						);
 
 					frag_color = vec4((vec3(0.3) + vec3(diffuse)) * vec3(0.7), 1.0);

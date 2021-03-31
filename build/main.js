@@ -49801,7 +49801,7 @@ var Sphere = /*#__PURE__*/function () {
       }
 
       gl.attachShader(this.program, this.vertex_shader);
-      this.fragment_shader_code = "#version 300 es\n\n\t\t\t\tprecision highp int;\n\t\t\t\tprecision highp float;\n\n\t\t\t\tuniform vec3 light_position;\n\n\t\t\t\tin vec4 v_world_position;\n\t\t\t\tin vec4 v_camera_position;\n\t\t\t\tin vec3 v_color;\n\t\t\t\tin vec3 v_normal;\n\n\t\t\t\tout vec4 frag_color;\n\n\t\t\t\tvoid main (void) {\n\n\t\t\t\t\tfloat diffuse =\n\t\t\t\t\t\tdot(\n\n\t\t\t\t\t\t\tnormalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),\n\n\t\t\t\t\t\t\tnormalize(v_camera_position.xyz - v_world_position.xyz)\n\t\t\t\t\t\t);\n\n\t\t\t\t\tfrag_color = vec4((vec3(0.3) + vec3(diffuse)) * vec3(0.7), 1.0);\n\t\t\t\t}\n\t\t\t\t";
+      this.fragment_shader_code = "#version 300 es\n\n\t\t\t\tprecision highp int;\n\t\t\t\tprecision highp float;\n\n\t\t\t\tuniform vec3 light_position;\n\n\t\t\t\tin vec4 v_world_position;\n\t\t\t\tin vec4 v_camera_position;\n\t\t\t\tin vec3 v_color;\n\t\t\t\tin vec3 v_normal;\n\n\t\t\t\tout vec4 frag_color;\n\n\t\t\t\tvoid main (void) {\n\n\t\t\t\t\tfloat diffuse =\n\t\t\t\t\t\tdot(\n\n\t\t\t\t\t\t\tnormalize(cross(dFdx(v_world_position.xyz), dFdy(v_world_position.xyz))),\n\n\t\t\t\t\t\t\tnormalize(v_camera_position.xyz + vec3(1.0) - v_world_position.xyz)\n\t\t\t\t\t\t);\n\n\t\t\t\t\tfrag_color = vec4((vec3(0.3) + vec3(diffuse)) * vec3(0.7), 1.0);\n\t\t\t\t}\n\t\t\t\t";
       this.fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
       gl.shaderSource(this.fragment_shader, this.fragment_shader_code);
       gl.compileShader(this.fragment_shader);
