@@ -732,8 +732,8 @@ class Sphere {
 				const normal =
 					this._v3
 						.copy(_in)
-						.to(normal_proj)
-						.normalize();
+						.to(normal_proj);
+					// .normalize();
 
 
 
@@ -745,7 +745,7 @@ class Sphere {
 								_in
 									.clone()
 									.to(intersection)
-									.normalize()
+									// .normalize()
 									.intersectPlane(_in, normal, normal_proj),
 						);
 
@@ -1063,4 +1063,4 @@ window._setTreeDepth = (depth) => {
 
 
 
-console.log('v1');
+console.log('v2');

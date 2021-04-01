@@ -50118,10 +50118,12 @@ var Sphere = /*#__PURE__*/function () {
 
           var normal_proj = _this2._v1.copy(out2).add(_this2._v2.copy(out1).to(out2).normalize().mulS(normal_h));
 
-          var normal = _this2._v3.copy(_in).to(normal_proj).normalize();
+          var normal = _this2._v3.copy(_in).to(normal_proj); // .normalize();
+
 
           var intersections_extended = intersections_sorted.map(function (intersection) {
-            return _in.clone().to(intersection).normalize().intersectPlane(_in, normal, normal_proj);
+            return _in.clone().to(intersection) // .normalize()
+            .intersectPlane(_in, normal, normal_proj);
           });
 
           if (_inverse && inverse || !_inverse && !inverse) {
@@ -50339,7 +50341,7 @@ window._setTreeDepth = function (depth) {
   console.warn('tree depth updated');
 };
 
-console.log('v1');
+console.log('v2');
 
 /***/ }),
 
