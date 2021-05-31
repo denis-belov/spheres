@@ -203,6 +203,7 @@ class Sphere {
 				out vec3 v_normal;
 
 				layout (std140) uniform Camera
+
 					{
 						mat4 transformation_matrix;
 
@@ -211,15 +212,16 @@ class Sphere {
 						mat4 projection_matrix;
 					};
 
-				void main (void) {
+				void main (void)
 
-					v_world_position = vec4(in_position, 1.0);
-					v_camera_position = transformation_matrix[3];
-					v_color = v_world_position.xyz;
-					v_normal = in_normal;
+					{
+						v_world_position = vec4(in_position, 1.0);
+						v_camera_position = transformation_matrix[3];
+						v_color = v_world_position.xyz;
+						v_normal = in_normal;
 
-					gl_Position = projection_matrix * view_matrix * v_world_position;
-				}
+						gl_Position = projection_matrix * view_matrix * v_world_position;
+					}
 				`;
 
 			this.vertex_shader = gl.createShader(gl.VERTEX_SHADER);
